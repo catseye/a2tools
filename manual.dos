@@ -1,0 +1,146 @@
+
+
+
+			A2TOOLS Manual for MS-DOS
+
+
+
+NAME
+       A2TOOLS.EXE  -  tools  to  move data to and from Apple DOS
+       3.3 disk images (Tip: To reduce typing on the command line
+       it is better to shorten the program name to something like
+       A2.EXE.)
+
+SYNOPSIS
+       a2 dir disk_image
+       a2 out [-r] disk_image a2_file [target_file]
+       a2 in [-r] filetype disk_image a2_file [source_file]
+       a2 del filename
+
+DESCRIPTION
+       a2tools is a set of commands that facilitates the transfer
+       of data between DOS and the Apple II  environment via disk
+       images (.dsk files).  It is intended for use  mainly  with
+       Apple II emulators.
+
+   Features
+       -      Works with DOS 3.3-order .dsk disk images.
+
+       -      Expands  tokenized Integer and Applesoft BASIC pro-
+              grams.
+
+       -      Knows about sparse files.
+
+       "dir" shows the directory contents of the specified image, 
+       including the disk volume and number of free sectors.
+
+       "out" writes the file contained in the image to the target
+       file if specified, or to the  standard  output  otherwise.
+       If  the target file exists, it is overwritten.  Unless the
+       -r option is given, the data will be  processed  according
+       to the file type as follows:
+
+       Text:  Output  all  data from the beginning of the file up
+              to the first zero byte.  The high  bit  is  cleared
+              and linefeeds are substituted for carriage returns.
+
+       BASIC (Integer and Applesoft):
+              Expand (detokenize) the program and  output  it  as
+              readable ASCII.
+
+       Binary:
+              Ignore the first two file bytes (base address), and
+              use the next two bytes (length) to produce a binary
+              file of the exact original size in bytes.
+
+       Other types:
+              Not accepted unless in raw mode (see below).
+
+
+       If the -r (raw mode) option is given, no postprocessing of
+       file data is done.  For files of type other than T (text),
+       the first 0/0 pair in the track/ sector list is assumed to
+       mark the end of  file.   However,  type  T  files  may  be
+       sparse, with 0/0 pairs marking unwritten segments.  Hence,
+       this mode will always output type T files in multiples  of
+       31232 bytes, and others in multiples of 256 bytes.
+
+       "in"  writes to a new file in the image the source file if
+       specified, or the standard input otherwise.  The file must
+       not  already exist.  The filetype argument must consist of
+       a single letter denoting the type of the new file.   Valid
+       values are:
+
+       T,t - text
+       I,i - Integer BASIC
+       A,a - Applesoft BASIC
+       B,b[.addr] - binary (optional base address in hex)
+       R,r - relocatable binary
+       S,s - type S (obscure)
+       X,x - "new A" (obscure)
+       Y,y - "new B" (obscure)
+
+       Unless the -r (raw mode) option is given, only types T and
+       B are acceptable to a2in.  Input processing is as follows:
+
+       Text:  Set  the  high  bit and substitute carriage returns
+              for linefeeds.
+
+       Binary:
+              Set the base address to that given in the  filetype
+              argument,  or  to  the  default of 0x2000.  Set the
+              file length to the exact  length  of  the  standard
+              input  stream.   Since the length field is only two
+              bytes wide, file lengths of 64K or more  are  ille-
+              gal.
+
+       In raw mode, the standard input is written directly to the
+       file.  Zeroes are used to pad any  partial  last  sectors.
+       If  the  new  file is type T, blocks containing all zeroes
+       are denoted by  a  0/0  entry  in  the  track/sector  list
+       instead  of  being  allocated  a  sector.  That is, sparse
+       files will be created.
+
+MS-DOS NOTES
+       Apple DOS 3.3 file names may  contain  spaces,  which  are
+       separators  for command-line arguments in DOS.  To prevent
+       this interpretation, enclose the entire  name  in  "double
+       quotes".   A  double  quote itself may be included by pre-
+       ceding it with a backslash.
+
+       Standard  input  and  output  cannot  be  used to transfer
+       binary data in DOS, in which case a source or  destination
+       filename is required.
+
+EXAMPLES
+       Send a readable copy of the BASIC program "PLOT FUNCTION"
+       on the disk image "basic.dsk" to the printer:
+
+       C> a2 out basic.dsk "PLOT FUNCTION" prn
+
+       Import the binary file "pics\airplane" into the disk image
+       "pics.dsk".  Assign it a name of  "AIRPLANE"  and  a  base
+       address of 0x4000 (second hi- res graphics page):
+
+       C> a2 in b.4000 pics.dsk AIRPLANE pics\airplane
+
+BUGS
+       -      Works with 143360-byte DOS 3.3-order images only.
+
+       -      Does not tokenize plain-text  BASIC  source  files,
+              although  this is easily accomplished using the DOS
+              3.3 EXEC command on such a file.
+
+       -      Doesn't handle multiple files, although it can eas-
+              ily  be  wrapped in shell scripts to enhance conve-
+              nience.
+
+AUTHOR
+       Terry Kyriacopoulos <terryk@echo-on.net>
+
+
+
+
+                           7 April 2001
+
+

@@ -1,0 +1,57 @@
+
+    a2tools - utilities for transferring data between Unix and Apple II
+              DOS 3.3 disk images.
+
+    Copyright (C) 1998, 2001  Terry Kyriacopoulos
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+    Author's e-mail address: terryk@echo-on.net
+
+-------------------------------------------------------------------------
+
+PACKAGE CONTENTS:
+   README	This file.
+   LICENSE	Details of the license that applies to this package.
+   A2TOOLS.EXE  MS-DOS executable program.
+   manual.dos   User's manual for the DOS version.
+   a2tools.6    User's manual for the UNIX version, in manpage format.
+   a2tools.c    Source program that should compile automatically on any
+		MS-DOS or UNIX ANSI C compiler.
+   install.csh  C-shell script for easy UNIX installation.
+		(Inspect before running it.)
+
+SUPPORTED PLATFORMS:
+   MS-DOS and UNIX.  The source is in ANSI C, and should compile properly
+   on both platforms.
+
+UNIX/Linux INSTALLATION:
+   Review the shell script "install.csh" and make any changes appropriate 
+   for your system. $BINDIR is the directory where the executable program 
+   will end up;  $MANDIR/man6 is the directory where the manual page will
+   end  up.  The  symbolic  links  are  necessary  -  the program behaves 
+   differently  depending  on  what  name  it  is  called as, and thus is 
+   equivalent to having several different programs.   See the manual page 
+   for details.
+   
+   Running "install.csh"  will compile the program and install it on your
+   system, ready for use.
+
+DOS INSTALLATION:
+   A prebuilt executable is furnished in this package.  Renaming it to an
+   acceptable short name is recommended.
+
+   Optionally,  the  source  program  may  be  compiled  with  any ANSI C
+   compiler.

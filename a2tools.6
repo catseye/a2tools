@@ -1,0 +1,170 @@
+.TH A2TOOLS 6 " 6 April 2001"
+.SH NAME
+.B a2tools
+\- tools to move data to and from Apple DOS 3.3 disk images
+
+.br
+.B a2ls 
+\- show directory of disk image
+.br
+.B a2out 
+\- read a file from disk image
+.br 
+.B a2in 
+\- write a file into disk image
+.br
+.B a2rm 
+\- remove a file from disk image
+.SH SYNOPSIS 
+.B a2ls
+disk_image 
+.br 
+.B a2out 
+[\fB\-r\fR] disk_image a2_file [target_file]
+.br
+.B a2in 
+[\fB\-r\fR] filetype disk_image a2_file [source_file]
+.br
+.B a2rm
+filename
+.SH DESCRIPTION
+.B a2tools
+is a set of commands that
+facilitates the transfer of data between Unix and the Apple II environment
+via disk images (\fB.dsk\fR files).  It is intended for use mainly with
+Apple II emulators such as \fBapple2\fR(6).
+.SS Features
+.TP
+.B -
+Works with DOS 3.3-order \fB.dsk\fR disk images.
+.TP
+.B -
+Expands tokenized Integer and Applesoft BASIC programs.
+.TP
+.B -
+Knows about sparse files.
+.PP
+.B a2ls
+shows the directory contents of the specified image,
+including the disk volume and number of free sectors.
+.PP
+.B a2out
+writes the file contained in the image to the target file if specified,
+or to the standard output otherwise.
+If the target file exists, it is overwritten.  Unless the
+\fB-r\fR option is given, the data will be processed according to the file
+type as follows:
+.TP
+.B Text:
+Output all data from the beginning of the file up to the first zero byte.
+The high bit is cleared and linefeeds are substituted for carriage
+returns.
+.TP
+.B BASIC (Integer and Applesoft): 
+Expand (detokenize) the program and output it as readable ASCII.
+.TP
+.B Binary:
+Ignore the first two file bytes (base address), and use the next
+two bytes (length) to produce a binary file of the exact original size in
+bytes.
+.TP
+.B Other types:
+Not accepted unless in raw mode (see below).
+.PP
+If the \fB-r\fR (raw mode) option is given, no postprocessing of file data
+is done.  For files of type other than T (text), the first
+0/0 pair in the track/ sector list is assumed to mark the end of file. 
+However, type T files may be sparse, with 0/0 pairs marking unwritten
+segments.  Hence, this mode will always output type T files in multiples
+of 31232 bytes, and others in multiples of 256 bytes. 
+
+.br
+.B a2in
+writes to a new file in the image the source file if specified,
+or the standard input otherwise.
+The file must not already exist.  The \fIfiletype\fP argument must
+consist of a single letter denoting the type of the new file.  Valid
+values are:
+
+.br
+\fBT\fR,\fBt\fR - text
+.br
+\fBI\fR,\fBi\fR - Integer BASIC
+.br
+\fBA\fR,\fBa\fR - Applesoft BASIC
+.br
+\fBB\fR,\fBb\fR[.addr] - binary (optional base address in hex)
+.br
+\fBR\fR,\fBr\fR - relocatable binary
+.br
+\fBS\fR,\fBs\fR - type S (obscure)
+.br
+\fBX\fR,\fBx\fR - "new A" (obscure)
+.br
+\fBY\fR,\fBy\fR - "new B" (obscure)
+
+.br
+Unless the \fB\-r\fR (raw mode) option is given, only types T and B 
+are acceptable to \fBa2in\fR.  Input processing is as follows:
+.TP
+.B Text:
+Set the high bit and substitute carriage returns for linefeeds.
+.TP
+.B Binary:
+Set the base address to that given in the \fIfiletype\fP argument, or to
+the default of 0x2000.  Set the file length to the exact length of the
+standard input stream.  Since the length field is only two bytes wide,
+file lengths of 64K or more are illegal.
+.PP
+In raw mode, the standard input is written directly to the file.  Zeroes
+are used to pad any partial last sectors.  If the new file is type T,
+blocks containing all zeroes are denoted by a 0/0 entry in the track/sector
+list instead of being allocated a sector.  That is, sparse files will be
+created.
+.SH EXAMPLES
+Send a readable copy of the BASIC program "PLOT FUNCTION" on the disk
+image "basic.dsk" to the printer:
+
+.br
+% 
+.B a2out basic.dsk 'PLOT FUNCTION' | lpr
+
+.br
+Import the binary file "pics/airplane" into the disk image "pics.dsk".
+Assign it a name of "AIRPLANE" and a base address of 0x4000 (second hi-
+res graphics page):
+
+.br
+% 
+.B a2in b.4000 pics.dsk 'AIRPLANE' pics/airplane
+
+.br
+Copy the Applesoft program "ROOT FINDER" from disk image "math.dsk" to
+"demo.dsk":
+
+.br
+%
+.B a2out -r math.dsk 'ROOT FINDER'|a2in -r a demo.dsk 'ROOT FINDER'
+
+.br
+Import the sparse database "ACCOUNTS" from a gzip-compressed file:
+
+.br
+%
+.B zcat accounts.gz | a2in -r t shop.dsk ACCOUNTS
+.SH BUGS
+.TP
+.B - 
+Works with 143360-byte DOS 3.3-order images only.
+.TP
+.B -
+Does not tokenize plain-text BASIC source files, although this
+is easily accomplished using the DOS 3.3 EXEC command on such a file.
+.TP
+.B -
+Doesn't handle multiple files, although it can easily be wrapped
+in shell scripts to enhance convenience.
+.SH AUTHOR
+Terry Kyriacopoulos <terryk@echo-on.net>
+.SH SEE ALSO
+\fBapple2\fR(6)
