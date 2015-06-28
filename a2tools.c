@@ -817,7 +817,10 @@ int main (int argc, char *argv[]) {
 
     /* prepare source filename by padding blanks */
     i=0;
-    while(i<30 && a2_name[i]) padded_name[i]=a2_name[i++] & 0x7f;
+    while(i<30 && a2_name[i]) {
+        padded_name[i]=a2_name[i] & 0x7f;
+        i++;
+        }
     while(i<30) padded_name[i++]=' ';
 
     /* get VTOC and check validity */
